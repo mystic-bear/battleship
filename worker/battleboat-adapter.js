@@ -46,14 +46,15 @@
   ];
 
   const DEFAULT_PRESETS = {
-    1: { level: 1, randomness: 0.45, topPool: 6, openingScale: 1.15, monteCarlo: null },
-    2: { level: 2, randomness: 0.28, topPool: 4, openingScale: 1.05, monteCarlo: null },
-    3: { level: 3, randomness: 0.1, topPool: 3, openingScale: 1, monteCarlo: null },
+    1: { level: 1, randomness: 0.58, topPool: 7, openingScale: 0.85, hitWeightScale: 0.45, monteCarlo: null },
+    2: { level: 2, randomness: 0.42, topPool: 5, openingScale: 0.9, hitWeightScale: 0.65, monteCarlo: null },
+    3: { level: 3, randomness: 0.1, topPool: 3, openingScale: 1, hitWeightScale: 1, monteCarlo: null },
     4: {
       level: 4,
       randomness: 0.04,
       topPool: 2,
       openingScale: 1,
+      hitWeightScale: 1,
       monteCarlo: {
         mode: "fallback",
         topCandidates: 3,
@@ -69,18 +70,18 @@
       randomness: 0,
       topPool: 1,
       openingScale: 1,
+      hitWeightScale: 1,
       monteCarlo: {
         mode: "rerank",
-        topCandidates: 5,
-        sampleCount: 240,
+        topCandidates: 7,
+        sampleCount: 360,
         hitBias: 12,
-        baseWeight: 0.5,
-        monteCarloWeight: 1.45,
+        baseWeight: 0.4,
+        monteCarloWeight: 1.7,
         tieCandidateCount: 2
       }
     }
   };
-
   const PRESETS = deps.AI_DIFFICULTY_PRESETS || DEFAULT_PRESETS;
   const getSharedPreset = typeof deps.getAiDifficultyPreset === "function"
     ? deps.getAiDifficultyPreset
@@ -145,12 +146,12 @@
       randomness: Number(preset?.randomness) || 0,
       topPool: Number(preset?.topPool) || 1,
       openingScale: Number(preset?.openingScale) || 1,
+      hitWeightScale: Number(preset?.hitWeightScale) || 1,
       searchPhase: searchPhase || "battleboat-probability",
       topCandidates: buildTopCandidateList(candidates, Math.max(4, preset?.topPool || 1)),
       monteCarlo: monteCarlo || null
     };
   }
-
   function buildIdleMonteCarloMeta(config, candidates, extra = {}) {
     if (!config) return null;
     return {
@@ -261,8 +262,9 @@
     return cells.reduce((count, cell) => count + (state.grid[cell.row][cell.col] === GRID_TYPES.HIT ? 1 : 0), 0);
   }
 
-  function updateProbabilityGrid(state) {
+  function updateProbabilityGrid(state, preset) {
     const probGrid = createMatrix(state.size, 0);
+    const hitWeightScale = Number(preset?.hitWeightScale) || 1;
 
     state.remainingShips.forEach((shipSize) => {
       ["horizontal", "vertical"].forEach((orientation) => {
@@ -273,7 +275,7 @@
             if (passesThroughHitCell(state, cells)) {
               const hitCount = countCoveredHits(state, cells);
               cells.forEach((cell) => {
-                probGrid[cell.row][cell.col] += PROB_WEIGHT * Math.max(1, hitCount);
+                probGrid[cell.row][cell.col] += PROB_WEIGHT * Math.max(1, hitCount) * hitWeightScale;
               });
             } else {
               cells.forEach((cell) => {
@@ -295,7 +297,6 @@
 
     return probGrid;
   }
-
   function applyOpeningWeights(probGrid, state, preset) {
     OPENINGS.forEach((entry) => {
       if (entry.row >= state.size || entry.col >= state.size) return;
@@ -387,7 +388,7 @@
   function rankCandidates(gameState, aiLevel = 3) {
     const preset = getPreset(aiLevel);
     const state = normalizeState(gameState);
-    const probGrid = updateProbabilityGrid(state);
+    const probGrid = updateProbabilityGrid(state, preset);
     applyOpeningWeights(probGrid, state, preset);
 
     const candidates = [];
@@ -501,3 +502,18 @@
     getHint
   };
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

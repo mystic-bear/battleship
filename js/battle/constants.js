@@ -144,16 +144,18 @@
   const AI_DIFFICULTY_PRESETS = {
     1: {
       level: 1,
-      randomness: 0.45,
-      topPool: 6,
-      openingScale: 1.15,
+      randomness: 0.58,
+      topPool: 7,
+      openingScale: 0.85,
+      hitWeightScale: 0.45,
       monteCarlo: null
     },
     2: {
       level: 2,
-      randomness: 0.28,
-      topPool: 4,
-      openingScale: 1.05,
+      randomness: 0.48,
+      topPool: 6,
+      openingScale: 0.9,
+      hitWeightScale: 0.6,
       monteCarlo: null
     },
     3: {
@@ -161,6 +163,7 @@
       randomness: 0.1,
       topPool: 3,
       openingScale: 1,
+      hitWeightScale: 1,
       monteCarlo: null
     },
     4: {
@@ -168,6 +171,7 @@
       randomness: 0.04,
       topPool: 2,
       openingScale: 1,
+      hitWeightScale: 1,
       monteCarlo: {
         mode: "fallback",
         topCandidates: 3,
@@ -183,18 +187,18 @@
       randomness: 0,
       topPool: 1,
       openingScale: 1,
+      hitWeightScale: 1,
       monteCarlo: {
         mode: "rerank",
-        topCandidates: 5,
-        sampleCount: 240,
+        topCandidates: 7,
+        sampleCount: 360,
         hitBias: 12,
-        baseWeight: 0.5,
-        monteCarloWeight: 1.45,
+        baseWeight: 0.4,
+        monteCarloWeight: 1.7,
         tieCandidateCount: 2
       }
     }
   };
-
   const SHIP_TYPES_BY_KEY = SHIP_TYPES.reduce((acc, ship) => {
     acc[ship.key] = ship;
     return acc;
@@ -223,6 +227,23 @@
     getAiDifficultyPreset
   };
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

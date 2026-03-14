@@ -378,14 +378,14 @@
     }
 
     const { own, target } = game.getFleetPanelData();
-    const renderList = (title, ships) => `
+    const renderList = (title, ships, { concealHits = false } = {}) => `
       <div class="fleet-block">
         <div class="panel-subtitle">${title}</div>
         <div class="fleet-list">
           ${ships.map((ship) => `
             <div class="fleet-row ${ship.sunk ? "sunk" : "afloat"}">
               <div class="fleet-name">${ship.label}</div>
-              <div class="fleet-meta">${ship.hits}/${ship.size} · ${ship.sunk ? this.t("fleet.sunk") : this.t("fleet.afloat")}</div>
+              <div class="fleet-meta">${concealHits ? (ship.sunk ? this.t("fleet.sunk") : this.t("fleet.afloat")) : `${ship.hits}/${ship.size} · ${ship.sunk ? this.t("fleet.sunk") : this.t("fleet.afloat")}`}</div>
             </div>
           `).join("")}
         </div>
@@ -395,7 +395,7 @@
     container.innerHTML = `
       <div class="panel-head">${this.t("fleet.title")}</div>
       ${renderList(this.t("fleet.player"), own)}
-      ${renderList(this.t("fleet.enemy"), target)}
+      ${renderList(this.t("fleet.enemy"), target, { concealHits: true })}
     `;
   },
 
@@ -566,6 +566,8 @@
     }, 2400);
   }
 };
+
+
 
 
 
