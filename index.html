@@ -1,0 +1,145 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animal Battleship</title>
+  <link rel="stylesheet" href="css/style.css?v=20260314_210804" />
+</head>
+<body>
+  <div class="app-shell">
+    <div id="start-screen" class="screen">
+      <div class="start-shell">
+        <section class="hero-card">
+          <div class="hero-kicker" data-i18n="hero.kicker">Battleboat Migration</div>
+          <h1 class="hero-title" data-i18n="document.title">Animal Battleship</h1>
+          <p class="hero-text" data-i18n="hero.text"></p>
+          <p class="hero-note" data-i18n="hero.note"></p>
+          <div class="hero-language">
+            <div class="hero-language-head">
+              <div class="hero-language-title" data-i18n="language.title">언어</div>
+              <div class="hero-language-desc" data-i18n="language.desc"></div>
+            </div>
+            <div id="language-switcher" class="language-switch"></div>
+          </div>
+        </section>
+
+        <section id="menu-main" class="menu-card">
+          <div id="resume-card" class="resume-card hidden"></div>
+
+          <div class="section-head">
+            <div class="section-kicker" data-i18n="start.quickStartKicker">Quick Start</div>
+            <div class="section-title" data-i18n="start.quickStartTitle">빠른 시작</div>
+          </div>
+          <div id="quick-start-list" class="preset-grid"></div>
+
+          <div class="section-head top-gap">
+            <div class="section-kicker" data-i18n="start.customSetupKicker">Custom Setup</div>
+            <div class="section-title" data-i18n="start.customSetupTitle">상대 설정</div>
+          </div>
+          <div class="setup-summary-card">
+            <div id="setup-summary" class="setup-summary"></div>
+            <button id="btn-open-setup" class="action-btn primary" onclick="ui.showSetup()" data-i18n="start.openCustomSetup">상대 설정 열기</button>
+          </div>
+          <div class="start-archive-actions">
+            <button id="btn-open-archive" class="action-btn secondary" onclick="game.openArchive()" data-i18n="buttons.archive">아카이브</button>
+          </div>
+        </section>
+
+        <section id="menu-setup" class="menu-card hidden">
+          <div class="section-head">
+            <div class="section-kicker" data-i18n="setup.kicker">Setup</div>
+            <div class="section-title" data-i18n="setup.title">상대와 옵션 설정</div>
+          </div>
+          <div id="setup-player-list" class="setup-list"></div>
+          <div id="setup-option-list" class="setup-list top-gap"></div>
+          <div class="setup-actions">
+            <button class="action-btn secondary" onclick="ui.hideSetup()" data-i18n="setup.back">뒤로</button>
+            <button id="btn-start-match" class="action-btn primary" onclick="game.startConfiguredGame()" data-i18n="buttons.startMatch">새 게임 시작</button>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <div id="game-screen" class="screen hidden">
+      <header class="game-topbar">
+        <div class="topbar-copy">
+          <div class="topbar-title">Animal Battleship</div>
+          <div id="game-subtitle" class="topbar-subtitle">Battle in progress</div>
+        </div>
+        <div id="turn-chip" class="turn-chip"></div>
+        <div class="topbar-actions">
+          <button class="action-btn secondary" onclick="game.returnToMenu()" data-i18n="buttons.returnMenu">메뉴</button>
+          <button class="action-btn secondary" onclick="game.restartCurrentGame()" data-i18n="buttons.restart">재시작</button>
+          <button class="action-btn primary" onclick="game.requestHint()" data-i18n="buttons.hint">힌트</button>
+          <button class="action-btn secondary" onclick="game.openArchive()" data-i18n="buttons.archive">아카이브</button>
+        </div>
+      </header>
+
+      <div id="status-line" class="status-line"></div>
+
+      <main class="game-layout">
+        <section class="boards-stack">
+          <article class="board-card">
+            <div class="board-card-head">
+              <h2 id="own-board-title" class="board-title">내 함대</h2>
+            </div>
+            <div id="own-board" class="board-host"></div>
+          </article>
+
+          <article class="board-card">
+            <div class="board-card-head">
+              <h2 id="target-board-title" class="board-title">공격 보드</h2>
+            </div>
+            <div id="target-board" class="board-host"></div>
+          </article>
+        </section>
+
+        <aside class="game-sidebar">
+          <section id="fleet-status" class="panel-card"></section>
+          <section id="shot-log" class="panel-card"></section>
+          <section id="hint-panel" class="panel-card"></section>
+        </aside>
+      </main>
+    </div>
+  </div>
+
+  <div id="archive-overlay" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="modal-title" data-i18n="archive.title">최근 게임</div>
+        <button class="action-btn secondary" onclick="game.closeArchive()" data-i18n="buttons.close">닫기</button>
+      </div>
+      <div id="archive-list" class="archive-list"></div>
+    </div>
+  </div>
+
+  <div id="turn-handoff-overlay" class="modal hidden">
+    <div class="modal-card handoff-card">
+      <div class="modal-title" data-i18n="handoff.title">턴 넘김</div>
+      <div id="turn-handoff-text" class="handoff-text"></div>
+      <button id="btn-turn-handoff" class="action-btn primary" data-i18n="buttons.continueTurn">계속</button>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <script src="shared/utils.js?v=20260314_210804"></script>
+  <script src="shared/constants.js?v=20260314_210804"></script>
+  <script src="shared/i18n.js?v=20260314_210804"></script>
+  <script src="js/battle/constants.js?v=20260314_210804"></script>
+  <script src="js/battle/placement.js?v=20260314_210804"></script>
+  <script src="js/battle/state.js?v=20260314_210804"></script>
+  <script src="js/battle/rules.js?v=20260314_210804"></script>
+  <script src="js/battle/render-ships.js?v=20260314_210804"></script>
+  <script src="js/battle/render-overlays.js?v=20260314_210804"></script>
+  <script src="js/battle/hint-builder.js?v=20260314_210804"></script>
+  <script src="js/battle/archive.js?v=20260314_210804"></script>
+  <script src="js/ai-bridge.js?v=20260314_210804"></script>
+  <script src="js/persistence/save-manager.js?v=20260314_210804"></script>
+  <script src="js/game.js?v=20260314_210804"></script>
+  <script src="js/ui.js?v=20260314_210804"></script>
+  <script src="js/app.js?v=20260314_210804"></script>
+</body>
+</html>
+
