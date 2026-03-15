@@ -305,7 +305,9 @@
     const targetKey = game.getTargetKeyForPerspective();
     const ownParticipant = game.gameState.players[perspective];
     const targetParticipant = game.gameState.players[targetKey];
-    const allowTargetInput = game.isHumanTurn()
+    const revealTargetFleet = game.gameState.phase === PHASES.GAME_OVER;
+    const allowTargetInput = !revealTargetFleet
+      && game.isHumanTurn()
       && game.gameState.turn === perspective
       && !game.turnHandoffPending
       && !game.aiThinking
@@ -318,8 +320,8 @@
     });
 
     this.renderBoardScene("target-board", targetParticipant, {
-      showShips: false,
-      interactive: true,
+      showShips: revealTargetFleet,
+      interactive: !revealTargetFleet,
       allowInput: allowTargetInput,
       onSelect: (row, col) => game.applyAttackAt(row, col)
     });
@@ -566,6 +568,7 @@
     }, 2400);
   }
 };
+
 
 
 
